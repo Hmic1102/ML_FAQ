@@ -26,8 +26,8 @@
 
     - **L1 Regularization**, also known as LASSO or L1 norm, is the sum of the absolute values of all parameters.
         $$
-            \lVert x \lVert_1=\sum_{i=1}^m\lvert x_i \lvert
-        $$
+\lVert x \rVert_1 = \sum_{i=1}^m \lvert x_i \rvert
+$$
     
     - **L2 Regularization**, also known as Ridge or L2 norm, is the square root of the sum of squares of all parameters.
 
