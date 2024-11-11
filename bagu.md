@@ -228,110 +228,110 @@
         where $M$ is the number of classes.
 
 
-### 朴素贝叶斯 Naive Bayes
+### Naive Bayes
 
-1. 概率相关公式及贝叶斯定理
+1. Probability Formulas and Bayes' Theorem
 
-    - 条件概率：事件 A 在另外一个事件 B 已经发生条件下的发生概率，即 $p(A|B)$；
-    - 联合概率：事件 A 和事件 B 同时发生的概率，即 $p(A, B) = p(A|B) * p(B)$；
-    - 全概率：若事件 B1, B2, ..., Bn 构成一个**完备事件组**，即他们两两不相容，且和为全集，则对于任意事件 A 有：<br>$p(A)=\sum^n_{i=1} [p(A|B_i)*p(B_i)]$
-    - 贝叶斯概率：在日常生活中，有时候我们难以直接求出 $p(A_i|B)$，但我们若已知 $p(B|A_i)$，$p(A_i)$ 和 $p(B)$，则有：
+    - **Conditional Probability**: The probability of event A given that event B has occurred, denoted as $p(A|B)$;
+    - **Joint Probability**: The probability of both events A and B occurring, denoted as $p(A, B) = p(A|B) * p(B)$;
+    - **Total Probability**: If events $B_1, B_2, ..., B_n$ form a **complete set of events**, meaning they are mutually exclusive and cover the entire sample space, then for any event A:<br>$p(A)=\sum^n_{i=1} [p(A|B_i)*p(B_i)]$
+    - **Bayesian Probability**: Often, it is difficult to directly find $p(A_i|B)$, but if $p(B|A_i)$, $p(A_i)$, and $p(B)$ are known, we can calculate:
         $$
             p(A_i|B) = \frac{p(B|A_i)*p(A_i)}{p(B)} = \frac{p(B|A_i)*p(A_i)}{\sum^n_{j=1}p(B|A_j)*p(A_j)}
         $$
-        其中，$p(A_i|B)$ 被称为**后验概率**，$p(A_i)$ 被称为**先验概率**。
+        where $p(A_i|B)$ is the **posterior probability**, and $p(A_i)$ is the **prior probability**.
 
 
-2. 朴素贝叶斯分类器
+2. Naive Bayes Classifier
 
-    - 设 $x=\{a_1,a_2,...,a_m\}$ 为一个待分类项，其中 $a_i$ 是 $x$ 的特征属性。
-    - 有类别集合 $C=\{y_1,y_2,...,y_n\}$。
-    - 对每一个类别 $y_i$，统计各个特征属性的条件概率，即 $p(a_1|y_1)$, $p(a_2|y_1)$, ..., $p(a_m|y_1)$。
-    - 根据贝叶斯公式，求得 $p(y_i|x)=\frac{p(x|y_i)*p(y_i)}{p(x)}$。
-    - 计算所有类别的 $p(y_i|x)$，概率最大的 $y_k$ 即为预测的类别。
-    - 该分类器之所以被称为“朴素”贝叶斯，是因为模型假设待分类项 $x$ 的所有特征都是**独立的**事件。
-    - 常见的朴素贝叶斯分类器有：
-        - GaussianNB，该分类器用**高斯分布**来假设类别的先验概率分布，一般用于连续型数据。
-        - MultinomialNB，该分类器用**多项式分布**来假设类别的先验概率分布，用于多项式数据。
-        - BernoulliNB，该分类器用**伯努利分布**来假设类别的先验概率分布，用于二项分布数据。
-
-
-3. 朴素贝叶斯分类器的优缺点
-
-    朴素贝叶斯分类器的主要优点有：
-    - 模型发源于古典数学概论，算法比较简单，且有稳定的分类效率；
-    - 对小规模的数据表现好，适合多分类任务；
-    - 对缺失数据不敏感，例如文本分类等任务；
-    - 不存在过拟合的说法。
-
-    朴素贝叶斯分类器的缺点有：
-    - 朴素贝叶斯假设特征之间相互独立，但在现实中这个假设往往不成立；
-    - 朴素贝叶斯需要先估计先验概率，如果估计不准确容易影响分类结果；
-    - 基于概率的分类有可能会不准确。
+    - Let $x=\{a_1,a_2,...,a_m\}$ represent an item to be classified, where $a_i$ represents the feature attributes of $x$.
+    - Define a set of classes $C=\{y_1,y_2,...,y_n\}$.
+    - For each class $y_i$, compute the conditional probability for each feature attribute, i.e., $p(a_1|y_1)$, $p(a_2|y_1)$, ..., $p(a_m|y_1)$.
+    - Using Bayes' theorem, calculate $p(y_i|x)=\frac{p(x|y_i)*p(y_i)}{p(x)}$.
+    - Compute $p(y_i|x)$ for all classes, and the class with the highest probability $y_k$ is the predicted class.
+    - This classifier is termed "Naive" Bayes because it assumes that all features in $x$ are **independent**.
+    - Common Naive Bayes classifiers include:
+        - GaussianNB: Assumes a **Gaussian distribution** for class priors, commonly used for continuous data.
+        - MultinomialNB: Assumes a **multinomial distribution** for class priors, used for multinomial data.
+        - BernoulliNB: Assumes a **Bernoulli distribution** for class priors, used for binary data.
 
 
-4. Generative Model vs Discriminative Model 生成模型 / 判别模型
+3. Advantages and Disadvantages of Naive Bayes Classifier
 
-    生成模型通过学习联合概率 $P(X,Y)$，即特征 $x$ 与类别 $y$ 同时出现的概率，再对每一个类别求条件概率，取概率最大的类别作为预测结果，即 $P(Y|X) = \frac{P(X,Y)}{P(X)}$。
-     - 生成模型能学习到更多信息，如每个特征的边缘分布 $p(x)$；
-     - 生成模型收敛速度快，且对小规模数据或稀疏数据表现较好；
-     - 生成模型不容易出现过拟合现象；
-     - 生成模型的效果一般没有判别模型好。
+    Main advantages:
+    - Derived from classical mathematical principles, simple algorithm with stable classification efficiency;
+    - Performs well with small datasets and is suitable for multi-class tasks;
+    - Not sensitive to missing data, making it ideal for tasks like text classification;
+    - Generally avoids overfitting.
+
+    Disadvantages:
+    - Assumes feature independence, which may not hold in reality;
+    - Requires prior probability estimation, which, if inaccurate, may affect classification results;
+    - Probability-based classification may sometimes be inaccurate.
+
+
+4. Generative Model vs. Discriminative Model
+
+    **Generative Models** learn the joint probability $P(X,Y)$, i.e., the probability of both the feature $x$ and the class $y$, and then calculate the conditional probability for each class. The predicted class is the one with the highest probability, where $P(Y|X) = \frac{P(X,Y)}{P(X)}$.
+     - Generative models capture more information, such as the marginal distribution $p(x)$ for each feature;
+     - Converge faster and perform well with small or sparse data;
+     - Less prone to overfitting;
+     - Generally, accuracy is lower than that of discriminative models.
     
-    判别模型则是通过学习条件概率，即直接预测特征 $x$ 下类别 $y$ 的概率。
-     - 判别模型的分类边界更加灵活，能够拟合更加复杂的边界；
-     - 只用学习分类的信息，问题得到简化；
-     - 准确率普遍较生成模型较高。
+    **Discriminative Models** learn the conditional probability directly, predicting the class $y$ given features $x$.
+     - Offer flexible classification boundaries, able to fit more complex boundaries;
+     - Only need to learn information relevant to classification, simplifying the problem;
+     - Generally achieve higher accuracy than generative models.
 
 
-### 支持向量机 Support Vector Machine, SVM
+### Support Vector Machine (SVM)
 
-1. SVM 的核心思想？
+1. What is the core idea of SVM?
 
-    SVM 是定义在特征空间中的线性分类器，目标是使得分隔超平面两边的数据点离超平面的**间隔最大**。当数据线性可分时，可以通过**硬间隔最大化**来学习一个线性的超平面；当数据近似线性可分时，则可以通过加上一个松弛变量，通过**软间隔最大化**来学习超平面；当线性不可分时，也可以使用核函数，将输入空间映射到高维的特征空间。
+    SVM is a linear classifier in the feature space, with the objective of maximizing the **margin** between data points and the separating hyperplane. For linearly separable data, **hard margin maximization** is used to learn a linear hyperplane; for nearly linearly separable data, **soft margin maximization** with slack variables is applied; for non-linear data, kernel functions are used to map input data to a higher-dimensional feature space.
 
-2. 硬间隔最大化
+2. Hard Margin Maximization
 
-    首先定义超平面 $(w,b)$ 关于样本点 $(x_i,y_i)$ 的**函数间隔**为 $\hat{\gamma}_i=y_i(wx_i+b)$ 但是，如果成比例地改变 $w$ 和 $b$ 的值，函数间隔会发生改变，但其超平面并没有变。为了解决这个问题，引入**几何间隔**为超平面与样本点的直线距离 $\gamma_i=y_i(\frac{w}{||w||}x_i+\frac{b}{||w||})$。硬间隔最大化的优化目标就是找到合适的超平面 $(w,b)$，使得点到超平面的间隔最大，即：
+    Define the **functional margin** of the hyperplane $(w,b)$ for a sample point $(x_i,y_i)$ as $\hat{\gamma}_i=y_i(wx_i+b)$. To avoid changes in functional margin by proportionally adjusting $w$ and $b$, we introduce the **geometric margin**, which is the perpendicular distance between the sample point and the hyperplane: $\gamma_i=y_i(\frac{w}{||w||}x_i+\frac{b}{||w||})$. The optimization goal of hard margin maximization is to find the hyperplane $(w,b)$ that maximizes the margin:
     $$
         \max_{w,b} \gamma, \text{s.t.,} y_i(\frac{w}{||w||}x_i+\frac{b}{||w||}) \geq \gamma, i=1,2,...,N
     $$
-    我们可以将这个优化问题转化为：
+    This can be reformulated as:
     $$
         \min_{w,b} \frac{1}{2}||w||^2, \text{s.t.,} y_i(wx_i+b)-1 \geq 0,i=1,2,...,N
     $$
-    可以使用拉格朗日乘子将该问题转换为对偶问题，这样可以便于求解：
+    Using the Lagrange multipliers, this problem can be converted to a dual problem, which makes it easier to solve:
     $$
         \min_\alpha \frac{1}{2}\sum_i^N \sum_j^N \alpha_i \alpha_j y_iy_j(x_i\cdot x_j)-\sum_i^N \alpha_i, \text{s.t.,} \sum_i^N \alpha_i y_i=0, \alpha_i \geq 0,i=1,2,...,N
     $$
-    转换为对偶问题还可以便于引入**核技巧**来解决非线性问题，即将内积 $(x_i\cdot x_j)$ 用核函数 $K(x_i,x_j)=\phi(x_i)\cdot\phi(x_j)$ 来代替。
+    Converting to the dual problem also facilitates using **kernel functions** to address non-linear problems by replacing $(x_i\cdot x_j)$ with $K(x_i,x_j)=\phi(x_i)\cdot\phi(x_j)$.
 
-3. 软间隔最大化
+3. Soft Margin Maximization
 
-    在现实中数据并不可能总是线性可分（可能存在噪音点、离群点等脏数据），线性不可分意味着有些样本点 $(x_i,y_i)$ 不能满足函数间隔大于 1 的约束条件。为了使得模型更加鲁棒，我们需要将硬间隔转换为软间隔。对于每一个样本点，我们引进一个松弛变量 $\xi_i$，使得函数间隔加上松弛变量大于 1，即 $y_i(wx_i+b)\geq1-\xi_i$。
+    In reality, data may not be linearly separable due to noise or outliers, which means that some sample points $(x_i,y_i)$ may not satisfy the functional margin constraint. To make the model more robust, we convert hard margins to soft margins. A slack variable $\xi_i$ is introduced for each sample point so that $y_i(wx_i+b)\geq1-\xi_i$.
 
-    同时，添加一个惩罚参数 $C$，目标函数变为 $\frac{1}{2}||w||^2 + C\sum_i^N \xi_i$。惩罚参数的添加是使得**函数间隔尽可能大，而误分类点尽可能少**，惩罚参数是调和二者的系数。当 $\xi_i = 0$ 时，样本点在间隔之外；当 $0 <\xi_i < 1$ 时，分类正确，样本点在超平面与间隔边界之间；当 $\xi_i > 1$ 时，样本点被误分。
+    By adding a penalty parameter $C$, the objective function becomes $\frac{1}{2}||w||^2 + C\sum_i^N \xi_i$. The penalty parameter balances the goal of **maximizing margin while minimizing misclassified points**. When $\xi_i = 0$, the sample point is outside the margin; for $0 <\xi_i < 1$, the sample is correctly classified but within the margin boundary; and when $\xi_i > 1$, the sample is misclassified.
 
-4. Hinge Loss 合页损失函数
+4. Hinge Loss
 
-    Hinge Loss 的图像如图所示，横轴是函数间隔 $\hat{\gamma}_i=y_i(wx_i+b)$，当间隔 $\hat{\gamma}_i\geq 1$ 时，表示正确分类，损失值为 0；当间隔 $\hat{\gamma}_i < 0$ 时分类错误；当间隔 $0 < \hat{\gamma}_i < 1$ 时，分类正确，但样本点在间隔边界与超平面之间。Hinge Loss 对这样的样本点也会进行惩罚，提高了样本点的利用率，这使得 SVM 对训练样本数的依赖大大减少。
+    The Hinge Loss function is shown below, with the x-axis representing the functional margin $\hat{\gamma}_i=y_i(wx_i+b)$. When $\hat{\gamma}_i\geq 1$, the classification is correct, and the loss is zero; when $\hat{\gamma}_i < 0$, the classification is incorrect; for $0 < \hat{\gamma}_i < 1$, the sample is correctly classified but within the margin boundary. Hinge Loss penalizes such samples, making SVM less dependent on a large number of training samples.
 
     ![hinge-loss](imgs/hinge-loss.jpg)
 
 
-### 逻辑回归 Logistic Regression, LR
+### Logistic Regression (LR)
 
-1. 逻辑回归的核心思想？
+1. What is the core idea of logistic regression?
 
-    逻辑回归主要用于分类问题，对于所给数据集，认为可以用一条直线将数据线性分类。逻辑回归与线性回归的最主要区别在于逻辑回归主要关注于分类概率与输入向量的关系，即 $P(Y=1)$ 与 $x$ 的直接关系，然后通过概率值来判断是否属于某一类别。
+    Logistic regression is mainly used for classification tasks. It assumes that a linear boundary can classify the data. Unlike linear regression, logistic regression primarily focuses on the relationship between the probability of classification and the input vector, i.e., the direct relationship between $P(Y=1)$ and $x$, and uses the probability to determine the class.
 
-    逻辑回归主要考虑二分类问题。给定数据集：
+    Logistic regression primarily addresses binary classification. Given a dataset:
 
     $$
         D=(x_1,y_1), (x_2,y_2),...,(x_N,y_N), x_i\in R^n
     $$
 
-    由于 $w^T x+b$取值连续，因此可以用它来拟合条件概率 $p(Y=1|x)$. 最理想的函数其实是：
+    Since $w^T x+b$ is continuous, it can fit the conditional probability $p(Y=1|x)$. The ideal function is:
 
     $$
         p(Y=1|x)=
@@ -343,13 +343,13 @@
         , z = w^T x + b
     $$
 
-    但是，这个函数不可微，因此，我们使用 sigmoid 函数来拟合概率：
+    This function is not differentiable, so we use the sigmoid function to approximate the probability:
 
     $$
         y=\frac{1}{1+e^z}, z=w^T x + b
     $$
 
-    将 $y$ 视为类后验概率估计，则重写公式有：
+    Viewing $y$ as the posterior class probability, we can rewrite the formula as:
 
     $$
         P(Y=1|x)=\frac{1}{1+e^z}, z=w^T x + b,\\
@@ -359,18 +359,18 @@
         z = \ln\frac{P(Y=1|x)}{1-P(Y=1|x)}
     $$
 
-    因此，逻辑回归实际上是**使用线性回归模型的预测值来逼近分类任务的对数几率**，其优点有：
+    Thus, logistic regression **uses the predicted values of a linear regression model to approximate the log odds of classification**. Its advantages include:
 
-    - 不仅能够预测出类别，还能预测出属于该类别的概率，对于一些需要预测概率的任务很适用；
-    - 对数几率函数在任意阶都是**连续可导的凸函数**，因此可以使用许多优化算法求解。
+    - It can predict the probability of belonging to a class, which is useful for tasks that require probability estimation;
+    - The log-odds function is a **convex function** in any order, making it solvable by various optimization algorithms.
   
-2. 逻辑回归的损失函数与梯度
+2. Loss Function and Gradient in Logistic Regression
 
-    设：$P(Y=1|x) = p(x), P(Y=0|x) = 1 - p(x)$，则似然函数可以写为：
+    Let: $P(Y=1|x) = p(x), P(Y=0|x) = 1 - p(x)$, so the likelihood function can be written as:
 
     $$L(w) = \prod[p(x_i)]^{y_i}[1-p(x_i)]^{1-y_i}$$
     
-    为了方便求解，一般取对数似然函数：
+    Taking the logarithm (log-likelihood):
     
     $$
     \begin{aligned}
@@ -380,7 +380,7 @@
     \end{aligned}
     $$
 
-    使用梯度下降法求解时，取似然函数的**相反值**进行优化，求其梯度为：
+    Using gradient descent, the gradient is:
 
     $$    
     \begin{aligned}
@@ -389,46 +389,46 @@
     \end{aligned}
     $$
 
-    权重更新为：
+    Updating weights:
     
     $$w_j := w_j + \eta(\sum_i (y_i - p(x_i)) \cdot x_j),\text{ for }i\text{ in range}(n)$$
 
-3. 与 SVM 的区别？
+3. Differences Between LR and SVM
 
-    - 同样是更加关注于分类边界附近的数据点，不同之处在于，LR 通过非线性映射减小离分类平面远的数据点的权重，提升离分类平面近的数据点的权重；而 SVM 则是完全只关注于分类错误的点以及靠近分类平面的数据点，而不关注那些离分类平面较远的普通样本。
-    - LR 是参数模型，而 SVM 是非参数模型。参数模型的前提是假设数据符合某种分布（如 LR 假设数据服从伯努利分布），该分布由一些参数决定。依赖数据分布会使得 LR 模型在样本不均衡时影响分类效果；而非参数模型不直接依赖于分布。
-    - LR 能够产生概率，而 SVM 不能直接产生概率。
+    - Both focus on data points near the classification boundary. However, LR reduces the weights of data points far from the boundary, while SVM only considers misclassified points and those close to the boundary.
+    - LR is a parametric model, assuming data distribution (e.g., Bernoulli) that may affect classification with imbalanced data, whereas SVM is non-parametric and independent of data distribution.
+    - LR can produce probabilities, while SVM cannot directly produce probabilities.
 
 
-### 决策树 Decision Tree
+### Decision Tree
 
-1. 什么是决策树？
+1. What is a Decision Tree?
 
-    决策树以树状的结构对数据特征进行分类。建立一棵树，树上的每一个节点都是一个决策的判断，记为**分支**。将数据输入决策树，当在某节点数据不再分裂，则形成一个叶子节点，完成最终的分类。
+    A decision tree is a tree-like structure used for classification. Each node in the tree represents a decision, referred to as a **branch**. Data input to a decision tree is classified by following these branches until a terminal node or **leaf** is reached.
 
-2. 如何确定分类的指标？
+2. How to Determine the Classification Criteria?
 
-    简要来说，我们在每次选择划分特征时，都会选择**对分类最有帮助**的特征来作为接下来的划分特征。具体来说，我们通过计算特征的**熵**来评价特征的重要程度。
-    **熵** (Entropy) 被用来度量一个系统的混乱程度，代表一个系统中所有事件信息量的期望。
+    Generally, for each split, we select the feature that provides the most information for classification. This is evaluated by calculating the **entropy** of each feature.
+    **Entropy** measures the disorder of a system, representing the expected information in all events.
     $$
         H(X) = -\sum_{x \in X}p(x_i) \log p(x_i)
     $$
     $$
         H(X|A) = -\sum_{i=1}^d p(A=a_i)H(X|A=a_i)
     $$
-    熵越大，该系统的不确定性也越大。构造树的基本思想时随着树深度的增加，节点的熵迅速降低。熵降低的速度越快越好，以便生成一个高度尽可能**矮**的决策树。
+    Higher entropy means higher uncertainty. The basic concept in tree construction is to reduce entropy quickly as the tree depth increases. The faster entropy decreases, the shorter the resulting tree.
 
-    首先，我们根据分类的 label，计算不选择任何特征时，系统的熵值 $H(D)$。随后，我们分别计算考虑了各个特征之后，系统的熵值。我们计算每个特征的**信息增益** $Gain(D|A) = H(D) - H(D|A)$，并选择信息增益最大的特征作为新节点的划分特征。
+    First, we calculate the entropy $H(D)$ for the system without any feature. Then, we calculate the entropy of the system considering each feature. For each feature, we compute **information gain** $Gain(D|A) = H(D) - H(D|A)$ and choose the feature with the highest information gain.
 
-3. 决策树的分类
+3. Types of Decision Trees
 
-    - ID3。使用**信息增益**作为特征选择的评估方式。缺点主要是：当遇到稀疏特征时（如用户 ID），由于每项特征的样本比较少，可能会出现信息增益特别大的情况，导致决策树错误选择该稀疏特征作为划分特征。通常来说，ID3决策树偏向选择那些取值较多的特征属性。
-    - C4.5。使用**信息增益率**作为特征选择的评估方式。信息增益率计算方式如下：
+    - **ID3**: Uses **information gain** to evaluate feature importance. However, it may incorrectly select sparse features with high information gain.
+    - **C4.5**: Uses **information gain ratio** as a criterion, which is calculated as:
         $$
             GainRatio(D|A) = \frac{Gain(D|A)}{H(A)} = \frac{H(D)-H(D|A)}{H(A)}
         $$
-        然而，信息增益率偏向选择取值较少的特征。因此，C4.5决策树会选择信息增益大于平均水平的特征来进行信息增益率的计算。此外，C4.5相对于ID3决策树，增加了对连续值和缺失值的处理过程。
-    - CART。对于分类问题，CART 决策树使用 **Gini 系数**作为评估标准；而对于回归问题，CART 决策树使用 **MSE** 作为评估标准。公式如下：
+        C4.5 addresses ID3’s issues with sparse features and can handle continuous and missing values.
+    - **CART**: Uses **Gini coefficient** for classification tasks and **MSE** for regression tasks:
         $$
             Gini(X) = \sum_{x\in X} p(x_i)(1-p(x_i))
         $$
@@ -436,52 +436,50 @@
             Gini(X|A) = \sum_{i=1}^d p(A=a_i) Gini(X|A=a_i)
         $$
 
-4. 随机森林 Random Forest, RF
+4. Random Forest (RF)
 
-    使用 **Bagging 算法**，即有放回采样地选取 $n$ 个样本，建立 $m$ 个决策树分类器。多个分类器采用**投票机制**来产生最终的分类结果。
-    随机森林的“随机”有两重含义：
-    - 样本随机选择，即 $n < \lVert D\rVert$，在每个决策树中选择一部分样本，有利于增加模型对离群点、噪音点的鲁棒性。
-    - 特征随机选择，每个决策树中只挑选一部分特征进行分类，有利于筛选不重要的特征或无效的特征。
+    Random forests use **bagging**, where $n$ samples are selected with replacement to build $m$ decision tree classifiers. These classifiers use **voting** to produce the final classification result. "Random" in random forests has two aspects:
+    - Random sample selection (i.e., $n < \lVert D\rVert$) increases robustness to outliers and noise.
+    - Random feature selection in each tree helps to filter out unimportant or irrelevant features.
 
 
 ### XGBoost
 
-1. Boosting 思想
+1. The Concept of Boosting
 
-    当每个弱分类器的分类效果不理想时，我们可以尝试将多个不同的弱分类器组合起来，形成效果更好的强分类器。Boosting 着重于减小模型的 **bias**。Boosting 与 Bagging 的区别如下：
-    - 样本选择上，Bagging 在每次训练中是通过 Bootstrap 有放回选取不同的数据，每轮训练的数据集是独立的；Boosting 中每轮的训练集不变，只是训练集中每个样本的权重在训练中发生变化，样本的权重根据上一轮的分类结果进行调整。
-    - 模型预测上，Bagging 中每个模型的权重相等，通过投票或取均值的方式进行结合；Boosting 中每个弱分类器都有对应的权重，对于分类误差小的分类器分配更大的权重。
-    - 计算方式上，Bagging 的各个模型可以并行训练；Boosting 中每个模型只能串行训练，因为后一个模型的样本权重需要通过上一轮的训练结果来调整。
-    - *Bagging 着重于减小模型的 Variance；Boosting 着重于减小模型的 bias。*
+    When weak classifiers individually perform poorly, combining multiple weak classifiers can create a strong classifier. Boosting primarily focuses on reducing **bias**. Key differences between Boosting and Bagging include:
+    - **Sample selection**: Bagging uses bootstrap sampling, while Boosting uses the same training set but adjusts sample weights based on the previous round’s results.
+    - **Prediction**: Bagging gives equal weight to all classifiers, while Boosting assigns weights based on accuracy.
+    - **Computation**: Bagging can train in parallel, while Boosting requires sequential training as sample weights depend on prior results.
+    - *Bagging focuses on reducing variance; Boosting focuses on reducing bias.*
 
-    > **为何说 Bagging 是减小 Variance，Bagging 是减小 bias？**
+    > **Why Bagging reduces variance and Boosting reduces bias?**
     >
-    > 在 Bagging 中，对样本重采样，每个子样本训练一个强（甚至过强）模型，最后取平均。由于子样本之间的相似程度高，多个模型的类型、结构与分布也非常相似，故多个模型有着近似的效果。而经过 Bagging 后，可以有效减小子模型的过拟合情况，因此可以显著降低模型的 Variance。
-    > 在 Boosting 中，把许多个弱分类器组合成一个强的分类器，着重于提高弱模型的性能，即着重降低模型的 bias。而 Variance 则不在 Boosting 的考虑范围之内。在 Boosting 中，多个模型有着同样的优化目标，并且通过在每一轮中的不断优化，能够达到降低 bias 的目的。
-    > 
+    > Bagging samples with replacement to train each model, effectively reducing overfitting and lowering variance.
+    > Boosting sequentially optimizes weak classifiers to reduce bias.
 
+2. XGBoost Basics
 
-2. XGBoost 基本原理
-
-    在第 $t$ 轮训练中，在**保留前 $t-1$ 轮训练结果**的前提下，加入一棵树 $f_t$，使得目标函数**尽可能地降低**。用公式表达如下：
+    In the $t$-th training round, **preserving results from previous rounds**, a new tree $f_t$ is added to **minimize the objective function**:
     $$
         \begin{aligned}
             Obj_t & = \sum_{i=1}^n l(y_i, \hat{y}_i^t) \\
             & = \sum_{i=1}^n l(y_i, \hat{y}_i^{t-1} + f_t(x_i)) \\
         \end{aligned}
     $$
-    设损失函数为 MSE，则原目标函数写为：
+    If the loss function is MSE, then the objective function becomes:
     $$
         \begin{aligned}
             Obj_t &= \sum_{i=1}^n (y_i - (\hat{y}_i^{t-1} + f_t(x_i)))^2 \\
             & = \sum_{i=1}^n[2(\hat{y}_i^{t-1} - y_i)f_t(x_i)+f_t(x_i)^2] + \sum_{i=1}^n ({y_i - \hat{y}_i^{t-1}})^2
         \end{aligned}
     $$
-    其中，$\sum_{i=1}^n ({y_i - \hat{y}_i^{t-1}})^2$ 与本轮无关，可以视为常数，$(\hat{y}_i^{t-1} - y_i)$ 一般被叫做**残差**，表示了上一轮预测值与真实值之间的差异，也是 XGBoost 算法在每一轮中预测的主要目标。即，将上一轮的训练结果看作一个整体，而新的一轮则对残差值进行预测。
+    Here, $\sum_{i=1}^n ({y_i - \hat{y}_i^{t-1}})^2$ is unrelated to the current round and can be treated as a constant. $(\hat{y}_i^{t-1} - y_i)$, often called the **residual**, represents the difference between the prediction from the previous round and the actual value. In XGBoost, each new round predicts this residual.
 
     ![xgboost](imgs/XGBoost.png)
 
-    此外，XGBoost 在每个叶子节点上都增加了正则化项 $\Omega(f_t) = \gamma T + \lambda\frac{1}{2}\sum^T_{j=1} w_j^2$，其中，$T$ 代表叶子节点数量，$\lambda\frac{1}{2}\sum^T_{j=1} w_j^2$ 为 L2 正则化项。
+    Additionally, XGBoost adds a regularization term on each leaf node $\Omega(f_t) = \gamma T + \lambda\frac{1}{2}\sum^T_{j=1} w_j^2$, where $T$ is the number of leaf nodes and $\lambda\frac{1}{2}\sum^T_{j=1} w_j^2$ is the L2 regularization term.
+
 
 
 
