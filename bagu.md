@@ -485,145 +485,142 @@
 
 ## Deep Learning
 
-### DL 基础概念
+### Basic Concepts in Deep Learning
 
-1. 为什么神经网络需要偏置项？
+1. Why Do Neural Networks Need Bias Terms?
 
-    对于神经网络中的每一个神经元，都有 $y_i = W^TX_i + b$。这个式子本质上就是要用这个函数在空间中划分决策面。而如果没有偏置项，那么划分的超平面就只能经过原点。偏置项的加入使得神经网络的拟合更加灵活，如果没有偏置项，训练可能难以收敛或出现其他 bug。
+    For each neuron in a neural network, the function is defined as $y_i = W^TX_i + b$. This function essentially defines a decision boundary in the space. Without the bias term, the decision hyperplane would always pass through the origin, reducing the flexibility of the network. The bias term allows the network to better fit the data; without it, training may struggle to converge or may encounter other issues.
 
-    > **在所有场合都可以使用偏置项吗？**
+    > **Is it always necessary to use a bias term?**
     > 
-    > 不是。例如在卷积层之后，如果要添加 Batch Normalization 层，最好不添加偏置项，因为不起作用，且会占用显卡内存。
+    > No. For instance, after a convolutional layer, it is often better not to add a bias term if a Batch Normalization (BN) layer is used, as it would be ineffective and would take up GPU memory.
     > 
-    > 在 BN 中，有一步关键操作为：
+    > In BN, one critical step is:
     > 
     > $$
     >       \hat{x_i} = \frac{x_i - \mu_\mathcal{B}}{\sqrt{\sigma^2_{\mathcal{B}} + \epsilon}}
     > $$
     > 
-    > 其中，$\mu_\mathcal{B}$ 为均值，$\sigma^2_{\mathcal{B}}$ 为方差。在该操作中，偏置项在计算中会被抵消掉，故偏置项不起作用。
+    > where $\mu_\mathcal{B}$ is the mean and $\sigma^2_{\mathcal{B}}$ is the variance. Since the bias term is canceled out in this calculation, it becomes ineffective in this context.
 
 
 2. Back Propagation
 
-    BP 神经网络是由一个输入层、一个输出层和若干个隐藏层构成的。输入信号从输入层进入，经过隐藏层计算，并由输出层输出。将输出的结果和真实值进行比对得到训练的误差。该误差沿着输出层，经过隐藏层，最终传播到输入层的权值参数。由于误差传播方向和训练方向相反，故称“反向传播”。
+    A BP (back-propagation) neural network consists of an input layer, an output layer, and several hidden layers. Input signals pass through the hidden layers and produce output from the output layer. The error between the output and the true value is computed, and this error is propagated back through the hidden layers to update the weights from the input layer. This backward flow of error, opposite to the training direction, is called "back propagation."
 
-    反向传播是为了解决神经网络无法直接应用梯度下降法的问题。由于梯度下降法只能用于“能够通过得到误差”的情况，例如逻辑回归。但隐藏层并不存在所谓“误差”，因此只能通过先将误差反向传播到隐藏层，应用链式法则得到求导函数，再使用梯度下降法进行优化。反向传播算法可以看作是梯度下降法在链式法则（Chain Rule）中的应用。
+    Back propagation enables the use of gradient descent in neural networks by applying the chain rule to derive the error in hidden layers. It propagates the error back to obtain partial derivatives and allows optimization through gradient descent.
 
 
-3. 梯度消失和梯度爆炸问题
+3. Gradient Vanishing and Gradient Explosion
 
-    在反向传播的梯度更新中，若更新的梯度一直小于 0，就可能触发连乘效应，在之后的传播中越传越小，导致靠近输入层的权值几乎不更新，训练收敛速度变慢，这便是**梯度消失**。与之相反，若梯度过大则会触发**梯度爆炸**，以致于溢出，出现梯度为 NaN 的问题。
-    
-    > 当激活函数为 Sigmoid 时，容易触发梯度消失问题。因为 Sigmoid 函数的导数最大值只有 0.25，如图所示。
+    During back-propagation, if the gradient is consistently very small, the chain effect can lead to progressively smaller values as the error moves backward, causing the weights near the input layer to update minimally, slowing convergence. This is the **vanishing gradient** problem. Conversely, if gradients are too large, it can lead to **exploding gradients**, where values overflow, potentially resulting in NaN gradients.
+
+    > When the activation function is Sigmoid, the vanishing gradient problem is more likely, as the maximum derivative of the Sigmoid function is only 0.25, as shown in the figure.
     > 
     > ![sigmoid](imgs/sigmoid.jpg)
 
-    常见的缓解梯度消失 / 梯度爆炸的方法有：
-    - 使用其他**激活函数**，如ReLU等；
-    - 用更合理的**权值初始化**方式，如 Xavier 初始化，He 初始化。这两种初始化方法都能保证在传播时权值的方差不变。
-    - **Batch Normalization**. 梯度的更新与 $x$ 的值也有关系，因此用 BN 限制 $x$ 的分布也有利于缓解梯度消失 / 梯度爆炸问题；
-    - 对权重进行**正则化**（L1、L2）；
-    - 使用 **ResNet 网络**。ResNet 通过添加 Shortcut Connections，使得层与层之间可以跨层连接，减少了梯度消失 / 梯度爆炸的问题。
-    - 通过**梯度截断**（Gradient Truncation）手动防止梯度爆炸。
+    Common methods to mitigate vanishing/exploding gradients include:
+    - Using alternative **activation functions** such as ReLU;
+    - More appropriate **weight initialization** methods like Xavier or He initialization, which help maintain consistent variance during propagation;
+    - **Batch Normalization (BN)**, which stabilizes $x$ distributions and can prevent gradient issues;
+    - **Regularization** (L1, L2) for weights;
+    - Using **ResNet**, where shortcut connections allow gradients to flow more easily across layers, reducing vanishing/exploding gradients;
+    - **Gradient clipping** to manually prevent exploding gradients.
 
 
-4. 能不能将神经网络的所有权值都初始化为 0？
+4. Can All Weights in a Neural Network Be Initialized to Zero?
 
-    不能。事实上，不能将神经网络的所有权值都设置为同一值。否则，在神经网络的更新中，两权值的更新将一模一样。多个相同的神经元相当于只有一个神经元，会使得神经网络无法拟合。
+    No. Initializing all weights to the same value would lead to identical updates during training, causing neurons to be indistinguishable from one another, effectively making the network function like a single neuron, which would limit its ability to fit data.
 
-    因此，一般我们选择随机初始化，或是使用其他初始化方法，如 Xavier 初始化，He 初始化。这两种初始化方法都能保证在传播时权值的方差不变。
+    Random initialization, or initialization methods such as Xavier or He, are typically used to prevent this.
 
 
-5. 在深度学习中缓解过拟合问题
+5. Methods to Mitigate Overfitting in Deep Learning
 
-    深度学习中防止过拟合常见的方法有：
+    Common techniques to prevent overfitting in deep learning include:
 
-    - 获取更多、质量更高的数据
-      - 采集新的数据
-      - 数据增强（图片镜像、翻转等）
-      - 利用对抗网络生成数据
-    - 正则化（L1、L2）
+    - Obtaining more and higher-quality data
+      - Collecting new data
+      - Data augmentation (e.g., mirroring, flipping images)
+      - Using adversarial networks to generate data
+    - Regularization (L1, L2)
     - Dropout
     - Early Stopping
-    - 集成学习，如 Bagging、Boosting 等。
+    - Ensemble methods, such as Bagging and Boosting.
 
 
-6. Dropout 是什么？
+6. What is Dropout?
 
-    Dropout 是在每次训练过程中都随机舍弃一些神经元之间的连接。这样做可以降低对部分上层神经元的依赖关系，迫使模型去学习一些更具有鲁棒性的特征，使得模型泛化能力更强。
+    Dropout randomly drops some connections between neurons during training. This prevents the model from relying too heavily on specific neurons, forcing it to learn more robust features and improving generalization.
 
     ![dropout](imgs/dropout.png)
     
 
-7. Dropout 和 Batch Normalization 在训练和预测中的区别？
+7. Differences in Dropout and Batch Normalization During Training and Prediction
 
-    Dropout 在训练时采用，是为了减少神经元对部分上层神经元的依赖，减少过拟合的风险。而在预测中，应该用训练完成的模型，不需要 Dropout。
+    Dropout is applied during training to reduce neuron dependencies, lowering the risk of overfitting. During prediction, dropout is turned off to use the fully trained model.
 
-    对于 BN，在训练时使用每一批数据的均值和方差进行计算，对每一批数据单独进行归一化。但在测试时，可能不存在 batch 的概念（例如预测单条数据）。因此在测试时，一般使用所有训练数据的均值和方差进行计算。
+    In BN, each batch’s mean and variance are used for normalization during training. However, in testing, batch statistics may be unavailable (e.g., when predicting single samples). Therefore, during testing, the mean and variance calculated from all training data are used.
 
-    > **为什么不在训练的时候使用所有训练数据的均值和方差？**
+    > **Why not use the mean and variance of all training data during training?**
     > 
-    > 因为在训练中使用所有数据的均值和方差容易出现过拟合现象。
+    > Using batch-specific statistics during training helps reduce overfitting by introducing variability that can improve model robustness.
     > 
-    > BN 的原理就是将每一批数据都归一到相同的分布。而每一批数据的均值和方差都不相同，这个差别能够增加模型的鲁棒性，在一定程度上减少模型的过拟合现象。
-    > 
-    > 也正是因此，当应用 BN 时，一般要求将训练集完全打乱，并用一个较大的 batch size，否则，一批数据可能无法较好得代表训练集的分布，会影响模型训练的效果。
+    > Therefore, when using BN, the training set is usually shuffled and a large batch size is preferred to ensure each batch represents the dataset's distribution adequately.
 
 
-8. 常见的 Non-Linear Activation Function 及其优缺点
+8. Common Non-Linear Activation Functions and Their Advantages/Disadvantages
 
-    非线性激活函数是神经网络与感知机网络最大的区别，即将非线性特性引入到网络中。如果不用非线性激活函数，则每一层都是上一层的线性变换，无论网络有多少层，输出都是输入的线性组合。而加入非线性层后，神经网络便拥有了学习非线性关系的能力，这使得神经网络可以逼近任意形状的函数。
+    Non-linear activation functions differentiate neural networks from simple perceptron networks, introducing non-linear characteristics into the network. Without non-linear activation, each layer would be a linear transformation of the previous layer, producing linear outputs no matter how deep the network is. Non-linear activation enables neural networks to approximate non-linear relationships.
 
-   | 函数名 |         函数表达式        |        优点           |      缺点         |
-   |:-----:|:-----------------------:|:----------------------|:-----------------|
-   |Sigmoid|$\displaystyle f(z)=\frac{1}{1+e^{-z}}$|1. 将输入转换为 (0, 1) 的区间。|1. 在神经网络反向传播中可能出现梯度消失问题；<br>2. 函数均值不为 0，使得权值总往同一方向更新，<br>收敛速度慢。|
-   |  tanh |$\displaystyle f(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}$|1. 将输入转换为 (0, 1) 的区间；<br>2. 解决 Sigmoid 均值非 0 问题。|1. 依然存在梯度消失问题；<br>2. 幂函数计算复杂，训练时间大。|
-   |  ReLU |$f(z)=max(0,x)$|1. 解决了梯度消失的问题；<br>2. 计算与收敛速度快。|1. 函数均值不为 0；<br>2. Dead ReLU Problem. 当 $x<0$ 时梯度为 0，且<br>该神经元之后的神经元梯度永远为 0，即神经元直接<br>失效。通过合理的初始化，或是降低学习率来解决。|
-   |Leaky ReLU|$f(z)=max(\alpha \cdot x,x)$|1. 使得神经元在负数区域偏向于<br>激活而不是直接失效。|1. 函数均值不为 0；<br>2. $\alpha$ 的值需要确定且比较敏感（通常是一个非常小<br>的值，如 0.01）。
-
-
-9. Gradient Descent vs Stochastic Gradient Descent vs Mini-Batch Gradient Descent
-
-    |        方法     |                 优点           |            缺点               |
-    |:--------------:|:------------------------------|:------------------------------|
-    |Gradient Descent|1. 参数梯度更新方向大致确定；<br>2. 适合并行化计算。|1. 训练时收敛速度慢；<br>2. 当数据量大时，需要大量显存。|
-    |Stochastic Gradient<br> Descent (SGD)|1. 每次只随机抽取一条数据进行梯度更新，<br>花费代价小；<br>2. 适合大量数据的训练。|1. 需要更多迭代次数；<br>2. 参数更新的过程震荡很大，参数更新方向有很大的波动；<br>3. 不适合并行化计算。|
-    |Mini-Batch Gradient<br> Descent (MBGD)|结合了前两种方法的优势：<br>1. 比 GD 收敛速度快，比 SGD 更加稳定；<br>2. 能利用高度优化的矩阵运算，适合并行化；|1. 难以选择合适的学习率。太小的学习率会导致收敛缓慢；<br>太大的学习率会导致波动过大，可能跳出局部最优解。<br>可以采用动态调整学习率的方法（learning rate decay）。
+   | Function Name |         Expression         |        Advantages           |      Disadvantages        |
+   |:-------------:|:--------------------------:|:----------------------------|:--------------------------|
+   |Sigmoid|$\displaystyle f(z)=\frac{1}{1+e^{-z}}$|1. Maps input to (0, 1) range.|1. Can lead to vanishing gradients; <br>2. Mean is not zero, leading to slower convergence.|
+   |  tanh |$\displaystyle f(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}$|1. Maps input to (-1, 1) range; <br>2. Solves non-zero mean issue of Sigmoid.|1. Still susceptible to vanishing gradients; <br>2. Exponential computation is costly.|
+   |  ReLU |$f(z)=\max(0, x)$|1. Alleviates vanishing gradients; <br>2. Fast computation and convergence.|1. Mean is not zero; <br>2. **Dead ReLU Problem**: When $x<0$, gradient is zero, causing neurons to fail permanently. Solved by proper initialization or lowering the learning rate.|
+   |Leaky ReLU|$f(z)=\max(\alpha \cdot x, x)$|1. Allows neurons to remain active in the negative range, reducing dead neurons.|1. Mean is not zero; <br>2. Choosing $\alpha$ can be tricky, usually set to a small value like 0.01.|
 
 
-10. 常见的优化器及其对比
+9. Gradient Descent vs. Stochastic Gradient Descent vs. Mini-Batch Gradient Descent
 
-    |        方法     |                 特点                                          |
-    |:--------------:|:--------------------------------------------------------------|
-    |GD / SGD / MBGD|1. 难以选择合适的学习率。学习率太小会导致收敛缓慢；学习率太大会导致波动过大，可能跳出局部最优解。<br>2. 每个参数的学习率都是相同的。如果数据是稀疏的，且不同特征的出现频率相差较大，则会出现部分特征<br>学习不足的问题；<br>3. 在训练中容易陷入鞍点，即局部最优点，在这些点的梯度为 0，无法继续训练。|
-    | Momentum      |1. 借鉴了物理中的动量概念，模拟物体运动时的惯性，即更新的时候在一定程度上保留之前更新的方向，而不<br>是像 GD 算法一样完全按照新的梯度方向更新。这样可以增加稳定性，并且有一定的摆脱局部最优解的能力。<br>2. Momentum 算法会观察上一步的梯度，若当前梯度方向与历史梯度一致，则增强该方向的梯度，否则则削<br>弱该方向的梯度。|
-    |    AdaGrad    |1. 针对 GD 算法中对于每个参数都保持同一学习率的问题，AdaGrad 算法能在训练中自动对不同参数的学习率<br>进行调整。对于出现频率比较低的特征，加大更新的学习率；对于出现频率高的，减小学习率。<br>2. 由于这个特性，AdaGrad 非常适合用于处理稀疏的数据。|
-    |    RMSprop    |1. Root Mean Square prop. 对 AdaGrad 算法的改进，把 AdaGrad 的将历史梯度相加变成对历史梯度求均值；<br>2. 这种方法可以缓解 AdaGrad 算法学习率下降较快的问题。|
-    |     Adam      |1. Adam 算法结合了 AdaGrad 和 RMSprop 的优点，即动态更新参数的学习率。不同于 RMSprop 只参考了参<br>数的历史平均值，Adam 同时参考了梯度的平均值和方差。<br>2. 在各大机器学习库中，两次估计的衰减率默认值 $\beta_1$ 和 $\beta_2$ 分别为 0.9 和 0.999.|
-    |    AdamW      |1. 针对 Adam 算法中先进行梯度衰减再进行正则化，使得梯度大的参数无法正常被正则化的问题，在 AdamW<br>中将梯度衰减的步骤移到正则化后，解决了这一问题。
+    |        Method       |                 Advantages          |            Disadvantages                |
+    |:-------------------:|:-----------------------------------:|:---------------------------------------:|
+    |Gradient Descent|1. Provides a stable direction for parameter updates;<br>2. Suitable for parallel computation.|1. Slow convergence during training; <br>2. Requires large memory for large datasets.|
+    |Stochastic Gradient<br> Descent (SGD)|1. Performs updates based on a single random sample, making it computationally cheap;<br>2. Suitable for large datasets.|1. Requires more iterations; <br>2. Parameter updates can fluctuate significantly; <br>3. Not suitable for parallel computation.|
+    |Mini-Batch Gradient<br> Descent (MBGD)|Combines the advantages of both: <br>1. Faster convergence than GD, more stable than SGD;<br>2. Leverages highly optimized matrix operations, suitable for parallelization.|1. Choosing a suitable learning rate can be challenging. Too low leads to slow convergence, too high causes excessive fluctuations. Using learning rate decay can help.|
 
 
-11. 如何正确使用迁移学习？
+10. Common Optimizers and Their Comparison
 
-    通过使用之前在大数据集上经过训练的预训练模型，我们可以直接使用相应的结构和权重，将它们应用到我们正在面对的问题上。
+    |        Method       |                 Characteristics                                        |
+    |:-------------------:|:-----------------------------------------------------------------------:|
+    |GD / SGD / MBGD|1. Learning rate selection is challenging: too low leads to slow convergence, too high causes excessive fluctuations. <br>2. All parameters share the same learning rate, potentially underlearning sparse features.<br>3. Prone to saddle points, where the gradient is zero, causing training to stall.|
+    | Momentum      |1. Adapts the concept of momentum from physics, maintaining inertia by retaining the previous update direction, enhancing stability and ability to escape local minima.<br>2. Observes the previous gradient, strengthening it if consistent with the current direction, weakening it if opposite.|
+    |    AdaGrad    |1. Addresses the single learning rate limitation by adjusting the rate per parameter. Infrequent features receive a higher rate, while frequent ones receive a lower rate.<br>2. Works well for sparse data.|
+    |    RMSprop    |1. An improvement on AdaGrad that averages historical gradients instead of accumulating them, slowing the decline of the learning rate over time.|
+    |     Adam      |1. Combines advantages of AdaGrad and RMSprop, dynamically adjusting learning rates based on the moving average of the gradient and its variance.<br>2. Common default decay rates for two estimations are $\beta_1$ = 0.9 and $\beta_2$ = 0.999 in many ML libraries.|
+    |    AdamW      |1. Corrects Adam’s issue where large gradients couldn’t be effectively regularized, by applying weight decay after regularization.|
 
-    - 场景一：现有数据集***大***，数据与原数据相似度***高***
 
-        这是最理想的情况，采用预训练模型会变得非常高效。最好的运用方式是保持模型原有的结构和初始权重不变，随后在新数据集的基础上重新训练 / 微调。
+11. How to Properly Use Transfer Learning?
 
-    - 场景二：现有数据集***小***，数据与原数据集相似度***高***
+    By using a pre-trained model that was trained on a large dataset, we can directly leverage its structure and weights for the task at hand.
+
+    - Scenario 1: **Large** dataset, **high** similarity to the original dataset
+
+        This is the ideal scenario. The best approach is to retain the original model structure and initial weights and then fine-tune the model on the new dataset.
+
+    - Scenario 2: **Small** dataset, **high** similarity to the original dataset
         
-        在这种情况下，由于数据和原数据集相似度高，我们不需要重新训练模型，只需要将输出层改为新问题的结构即可。
+        In this case, since the new data is similar to the original, retraining the model is unnecessary; it’s enough to adjust the output layer for the new task.
 
-    - 场景三：现有数据集***大***，数据与原数据集相似度***低***
+    - Scenario 3: **Large** dataset, **low** similarity to the original dataset
 
-        因为实际数据与预训练模型的训练数据之间存在很大差异，采用预训练模型将不会是一种高效的方式。因此最好的方法还是只沿用预训练模型的结构。将预处理模型中的权重全都初始化后，在新数据集上**重新**开始训练。
+        Due to significant differences between the actual data and the pre-trained model’s data, using the pre-trained model may be inefficient. Instead, it’s better to retain only the model’s structure, reinitialize the weights, and start training from scratch.
 
-    - 场景四：现有数据集***小***，数据与原数据集相似度***低***
+    - Scenario 4: **Small** dataset, **low** similarity to the original dataset
 
-        这是最糟糕的一种情况。为了防止过拟合，我们不能从头开始训练。我们可以利用预训练模型较低的层进行特征提取，弥补数据集大小不足的缺陷，再利用较高的层进行训练（一般而言，神经网络较高的层具有较高的区分度，更适合用来训练数据本身）。因此，我们**冻结**预训练模型前 $k$ 层的权重，用于提取数据的特征，然后训练后 $n-k$ 层，并将原输出层改为新问题的结构。
-
+        This is the most challenging situation. To prevent overfitting, we can’t train from scratch. Instead, we use the lower layers of the pre-trained model for feature extraction, compensating for the lack of data size, while training only the higher layers (typically more discriminative) for the new task. Thus, we **freeze** the weights of the first $k$ layers and train the last $n-k$ layers, adjusting the output layer for the new task.
 
 
 ## Natural Language Processing
